@@ -3,9 +3,9 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const {User} = require('../models/models')
 
-const generateJwt = (id, email, role, name) => {
+const generateJwt = (id, email, role) => {
     return jwt.sign(
-        {id, email, role, name},
+        {id, email, role},
         process.env.SECRET_KEY,
         {expiresIn: '24h'}
     )
@@ -42,7 +42,7 @@ class UserController {
         if (!comparePassword) {
             return next(ApiError.internal('Указан неверный пароль'))
         }
-        const token = generateJwt(user.id, user.email, user.role, user.name)
+        const token = generateJwt(user.id, user.email, user.role)
         return res.json({token})
     }
 
