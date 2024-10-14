@@ -28,8 +28,8 @@ class UserController {
             return next(ApiError.badRequest('Пользователь успешно создан'))
         }
        
-        const token = generateJwt(user.id, user.email, user.role)
-        return res.json({token})
+        // const token = generateJwt(user.id, user.email, user.role)
+        // return res.json({token})
     }
 
     async login(req, res, next) {
