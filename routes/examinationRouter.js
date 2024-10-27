@@ -2,9 +2,9 @@ const Router = require('express')
 const router = new Router()
 const examinationController = require('../controllers/examinationController')
 
-router.post('/', examinationController.create)
-router.get('/', examinationController.getAll)
-router.delete('/', examinationController.remove)
+router.post('/newentry', examinationController.create)
+router.get('/getall', examinationController.getAll)
+router.delete('/del', examinationController.remove)
 
 // router.get('/auth',)
 
