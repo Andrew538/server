@@ -11,11 +11,11 @@ const User = sequelize.define('user', {
 
 const Examination = sequelize.define('examination', {
     id:{type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    data: {type: DataTypes.STRING, allowNull: false},
+    date: {type: DataTypes.STRING, allowNull: false},
     client: {type: DataTypes.STRING, allowNull: false},
     manager: {type: DataTypes.STRING, allowNull: false},
     product: {type: DataTypes.STRING, allowNull: false},
-    releaseDate: {type: DataTypes.INTEGER, allowNull: false},
+    releaseDate: {type: DataTypes.INTEGER, allowNull: true},
     result: {type: DataTypes.STRING, allowNull: true}
 })
 

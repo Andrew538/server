@@ -5,9 +5,9 @@ class ExaminationController {
     async create(req, res) {
        
         try {
-            const {data, client, manager, product, releaseDate, result} = req.body
+            const {date, client, manager, product, releaseDate, result} = req.body
 
-            const exam = await Examination.create({data, client, manager, product, releaseDate, result})
+            const exam = await Examination.create({date, client, manager, product, releaseDate, result})
             return res.json(exam)
 
             
@@ -19,8 +19,10 @@ class ExaminationController {
 
     async getAll(req, res) {
         let {id, limit, page} = req.query
+        // let {id} = req.query
+
         page = limit || 1
-        limit = limit || 9
+        limit = limit || 10000000
         let offset = page * limit - limit
         let exam;
         if (!id) {
@@ -28,7 +30,7 @@ class ExaminationController {
         }
 
         if (id) {
-            exam = await Examination.findAll({where:{id}, limit, offset})
+            exam = await Examination.findAll({where:{id}})
         }
 
         return res.json(exam)
