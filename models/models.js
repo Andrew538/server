@@ -15,7 +15,7 @@ const Examination = sequelize.define('examination', {
     client: {type: DataTypes.STRING, allowNull: false},
     manager: {type: DataTypes.STRING, allowNull: false},
     product: {type: DataTypes.STRING, allowNull: false},
-    releaseDate: {type: DataTypes.INTEGER, allowNull: true},
+    releaseDate: {type: DataTypes.STRING, allowNull: true},
     result: {type: DataTypes.STRING, allowNull: true}
 })
 

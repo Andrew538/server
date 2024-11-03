@@ -53,6 +53,30 @@ class ExaminationController {
        
     }
 
+    async upgrade(req, res) {
+        const {id, releaseDate} = req.body
+        try {
+            const updateFull = await Examination.update(
+                {
+                    releaseDate: releaseDate
+                },
+                {
+                    where: {
+                       id: id
+                    }
+                }
+                
+            )
+            return res.json(updateFull)
+            
+        } catch (error) {
+            return error.message
+            
+        }
+
+       
+    }
+
     
 }
 
