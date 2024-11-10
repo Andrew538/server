@@ -54,11 +54,12 @@ class ExaminationController {
     }
 
     async upgrade(req, res) {
-        const {id, releaseDate} = req.body
+        const {id, releaseDate, result} = req.body
         try {
             const updateFull = await Examination.update(
                 {
-                    releaseDate: releaseDate
+                    releaseDate: releaseDate,
+                    result: result
                 },
                 {
                     where: {
@@ -74,6 +75,21 @@ class ExaminationController {
             
         }
 
+       
+    }
+
+    async getOne(req, res) {
+        const {id} = req.query
+        try {
+            const oneExam = await Examination.findOne({
+                where: {id}
+            })
+        return res.json(oneExam)
+
+            
+        } catch (error) {
+            return error.message
+        }
        
     }
 
