@@ -5,9 +5,9 @@ class ExaminationController {
     async create(req, res) {
        
         try {
-            const {date, client, manager, product, releaseDate, result} = req.body
+            const {date, client, city, productionDate, numberReturnDocument, plantDocumentNumber,comment, manager, product, releaseDate, result} = req.body
 
-            const exam = await Examination.create({date, client, manager, product, releaseDate, result})
+            const exam = await Examination.create({date, client, city, productionDate, numberReturnDocument,plantDocumentNumber, comment, manager, product, releaseDate, result})
             return res.json(exam)
 
             
