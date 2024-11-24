@@ -4,9 +4,15 @@ const examinationController = require('../controllers/examinationController')
 
 router.post('/newentry', examinationController.create)
 router.get('/getall', examinationController.getAll)
+router.get('/getallworks', examinationController.getAllWorks)
+router.get('/getallarhive', examinationController.getAllArhive)
+
+// router.get('/pages', examinationController.pages)
+
 router.delete('/del', examinationController.remove)
 router.post('/upgrade', examinationController.upgrade)
 router.get('/getone', examinationController.getOne)
+router.get('/getstatus', examinationController.getStatus)
 
 
 

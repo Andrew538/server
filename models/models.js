@@ -23,6 +23,7 @@ const Examination = sequelize.define('examination', {
     releaseDate: {type: DataTypes.STRING, allowNull: true},
     result: {type: DataTypes.STRING, allowNull: true},
     comment: {type: DataTypes.STRING, allowNull: true},
+    statusExam: {type: DataTypes.STRING, allowNull: false},
 
 })
 
@@ -30,7 +31,7 @@ const TypeAKB = sequelize.define('typeakb', {
     name: {type: DataTypes.STRING, allowNull: false},
 
 })
-
+// sequelize.sync({ force: true })
 User.hasMany(Examination)
 Examination.belongsTo(User)
 
