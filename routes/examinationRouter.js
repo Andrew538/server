@@ -6,7 +6,7 @@ router.post('/newentry', examinationController.create)
 router.get('/getall', examinationController.getAll)
 router.get('/getallworks', examinationController.getAllWorks)
 router.get('/getallarhive', examinationController.getAllArhive)
-router.get('/getallcharger', examinationController.getAllСharger)
+router.get('/getallcharger', examinationController.getAllCharger)
 router.get('/getallready', examinationController.getAllReady)
 
 

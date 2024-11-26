@@ -52,37 +52,50 @@ class ExaminationController {
     async getAllArhive(req, res) {
         let {id} = req.query
        
-        let exam;
+        let examarhive;
         if (!id) {
-            exam = await Examination.findAll( {where: {
+            examarhive = await Examination.findAll( {where: {
                 statusExam: 'Arhive'
             }})
         }
-        return res.json(exam)
+        return res.json(examarhive)
     }
 
-    async getAllСharger(req, res) {
+    // async getAllСharger(req, res) {
+    //     let {id} = req.query
+       
+    //     let examcharger;
+    //     if (!id) {
+    //         examcharger = await Examination.findAll( {where: {
+    //             statusExam: 'Сharger'
+    //         }})
+    //     }
+    //     return res.json(examcharger)
+    // }
+
+    async getAllCharger(req, res) {
         let {id} = req.query
        
-        let exam;
+        let examcharger;
         if (!id) {
-            exam = await Examination.findAll( {where: {
-                statusExam: 'Сharger'
+            examcharger = await Examination.findAll( {where: {
+                statusExam: 'Charger'
             }})
         }
-        return res.json(exam)
+        return res.json(examcharger)
     }
+
 
     async getAllReady(req, res) {
         let {id} = req.query
        
-        let exam;
+        let examready;
         if (!id) {
-            exam = await Examination.findAll( {where: {
+            examready = await Examination.findAll( {where: {
                 statusExam: 'Ready'
             }})
         }
-        return res.json(exam)
+        return res.json(examready)
     }
 
 
