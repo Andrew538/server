@@ -58,11 +58,33 @@ class ExaminationController {
                 statusExam: 'Arhive'
             }})
         }
-
-        
-
         return res.json(exam)
     }
+
+    async getAllСharger(req, res) {
+        let {id} = req.query
+       
+        let exam;
+        if (!id) {
+            exam = await Examination.findAll( {where: {
+                statusExam: 'Сharger'
+            }})
+        }
+        return res.json(exam)
+    }
+
+    async getAllReady(req, res) {
+        let {id} = req.query
+       
+        let exam;
+        if (!id) {
+            exam = await Examination.findAll( {where: {
+                statusExam: 'Ready'
+            }})
+        }
+        return res.json(exam)
+    }
+
 
 
     async remove(req, res) {
