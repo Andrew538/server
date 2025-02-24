@@ -1,7 +1,6 @@
 const Router = require('express')
 const router = new Router()
 const examinationController = require('../controllers/examinationController')
-const examinationValidation = require('../validations/examinationValidation')
 router.post('/newentry', examinationController.create)
 router.get('/getall', examinationController.getAll)
 router.get('/getallworks', examinationController.getAllWorks)
