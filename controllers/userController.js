@@ -42,19 +42,32 @@ class UserController {
         if (!comparePassword) {
             return next(ApiError.internal('Указан неверный пароль'))
         }
-        // const token = generateJwt(user.id, user.email)
+       
         const token = generateJwt(user.id, user.email, user.role)
 
         return res.json({token})
     }
 
     async check(req, res, next) {
-      
-                const token = generateJwt(req.user.id, req.user.email, req.user.role)
-                return res.json({token})
+        const tok = req.body
+        console.log(tok)
+        if(!tok) {
+        return next(ApiError.internal('Пользователь не найден'))
+
+        }
+
+      try {
+        const token = generateJwt(req.user.id, req.user.email, req.user.role)
+        return res.json({token})
+      } catch (error) {
+        return next(ApiError.internal('Пользователь не найден'))
+
+      }
+       
         
        
     }
+
 
     async users(req, res) {
        let {id} = req.query

@@ -15,8 +15,9 @@ app.use(cors())
 app.use(express.json())
 app.use('/api', router)
 app.use(errorHandler)
-https 
-.createServer(app)
+// https 
+// .createServer(app)
+
 const start = async () => {
     try {
         await sequelize.authenticate()

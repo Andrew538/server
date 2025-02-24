@@ -1,10 +1,11 @@
 const {Examination} = require('../models/models')
-
+const { validationResult } = require("express-validator");
 
 class ExaminationController {
     async create(req, res) {
        
         try {
+      
             const {date, client, city, productionDate, numberReturnDocument, plantDocumentNumber,comment, manager, product, releaseDate, result, statusExam} = req.body
 
             const exam = await Examination.create({date, client, city, productionDate, numberReturnDocument,plantDocumentNumber, comment, manager, product, releaseDate, result, statusExam})
@@ -12,7 +13,7 @@ class ExaminationController {
 
             
         } catch (error) {
-            
+           
         }
         
     }
@@ -157,6 +158,24 @@ class ExaminationController {
         }
        
     }
+
+    
+    // async getOne(req, res) {
+    //     const {id} = req.params
+    //     try {
+    //         const oneExam = await Examination.findOne({
+    //             where: {id},
+    //             include: [{model: Examination, as: 'info'}]
+    //         })
+    //     return res.json(oneExam)
+
+            
+    //     } catch (error) {
+    //         return error.message
+    //     }
+       
+    // }
+
 
     async getStatus(req, res) {
         const {id} = req.query

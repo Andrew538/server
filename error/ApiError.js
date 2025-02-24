@@ -3,6 +3,7 @@ class ApiError extends Error{
         super();
         this.status = status
         this.message = message
+        
     }
 
     static badRequest(message) {
@@ -15,6 +16,10 @@ class ApiError extends Error{
 
     static forbidden(message) {
         return new ApiError(403, message)
+    }
+
+    static badInput(message) {
+        return new ApiError(1, message)
     }
 }
 

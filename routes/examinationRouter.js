@@ -1,7 +1,7 @@
 const Router = require('express')
 const router = new Router()
 const examinationController = require('../controllers/examinationController')
-
+const examinationValidation = require('../validations/examinationValidation')
 router.post('/newentry', examinationController.create)
 router.get('/getall', examinationController.getAll)
 router.get('/getallworks', examinationController.getAllWorks)
@@ -15,6 +15,8 @@ router.get('/getallready', examinationController.getAllReady)
 router.delete('/del', examinationController.remove)
 router.post('/upgrade', examinationController.upgrade)
 router.get('/getone', examinationController.getOne)
+// router.get('/:id', examinationController.getOne)
+
 router.get('/getstatus', examinationController.getStatus)
 
 
