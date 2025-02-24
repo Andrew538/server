@@ -1,5 +1,5 @@
 const {Examination} = require('../models/models')
-const { validationResult } = require("express-validator");
+ 
 
 class ExaminationController {
     async create(req, res) {
