@@ -49,12 +49,12 @@ class UserController {
     }
 
     async check(req, res, next) {
-        const tok = req.body
-        console.log(tok)
-        if(!tok) {
-        return next(ApiError.internal('Пользователь не найден'))
+        // const tok = req.body
+        // console.log(tok)
+        // if(!tok) {
+        // return next(ApiError.internal('Пользователь не найден'))
 
-        }
+        // }
 
       try {
         const token = generateJwt(req.user.id, req.user.email, req.user.role)
