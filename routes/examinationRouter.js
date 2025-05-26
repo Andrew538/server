@@ -13,6 +13,15 @@ router.get('/getallready', examinationController.getAllReady)
 
 router.delete('/del', examinationController.remove)
 router.post('/upgrade', examinationController.upgrade)
+router.post('/upgradeNumberReturnDocument', examinationController.upgradeNumberReturnDocument)
+router.post('/upgradePlantDocumentNumber', examinationController.upgradePlantDocumentNumber)
+router.post('/upgradeMovingToDefectWarehouse', examinationController.upgradeMovingToDefectWarehouse)
+router.post('/upgradeUpdateReleaseDate', examinationController.upgradeUpdateReleaseDate)
+
+
+
+
+
 router.get('/getone', examinationController.getOne)
 // router.get('/:id', examinationController.getOne)
 
