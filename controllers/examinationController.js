@@ -15,7 +15,7 @@ class ExaminationController {
       plantDocumentNumber,
       comment,
       manager,
-      product,
+      product, 
       releaseDate,
       result,
       statusExam,
@@ -42,6 +42,7 @@ class ExaminationController {
     return res.json(exam);
 
     // } catch (error) {
+    
 
     // }
   }
@@ -50,8 +51,8 @@ class ExaminationController {
     let { id } = req.query;
 
     let exam;
-    if (!id) {
-      exam = await Examination.findAll({
+    if (!id) { 
+      exam = await Examination.findAll({ 
         where: {
           statusExam: "New",
         },

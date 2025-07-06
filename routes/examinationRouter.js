@@ -23,13 +23,12 @@ router.post('/upgradeUpdateReleaseDate', examinationController.upgradeUpdateRele
 
 
 router.get('/getone', examinationController.getOne)
-// router.get('/:id', examinationController.getOne)
+
 
 router.get('/getstatus', examinationController.getStatus)
 
 
 
-// router.get('/auth',)
 
 
 

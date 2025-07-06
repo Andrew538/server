@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 const {User} = require('../models/models');
+const { where } = require('sequelize');
 
 const generateJwt = (id, email, role) => {
     return jwt.sign(
@@ -50,10 +51,12 @@ class UserController {
         return res.json({token})
     }
 
+
+    
     async check(req, res, next) {
      
         try {
-            const token = generateJwt(req.user.id, req.user.email, req.user.role)
+            const token = generateJwt(req.user.id, req.user.email, req.user.role, req.user.surname)
             return res.json({token})
           } catch (error) {
             return next(ApiError.internal('Пользователь не найден'))
@@ -66,12 +69,16 @@ class UserController {
     }
 
 
-    async users(req, res) {
+    async allManagers(req, res) {
        let {id} = req.query
       let all;
       
        if (!id) {
-        all = await User.findAll({id})
+        all = await User.findAll({
+            where: {
+                role: 'MANAGER'
+            }
+        })
     }
    
        return res.json(all)
