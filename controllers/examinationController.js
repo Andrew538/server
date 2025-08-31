@@ -144,7 +144,7 @@ class ExaminationController {
       // error.console.log(error)
     }
   }
-
+    
   async upgrade(req, res) {
     const { id, result, statusExam } = req.body;
     try {
@@ -158,13 +158,16 @@ class ExaminationController {
             id: id,
           },
         }
-      );
-      // return res.json(updateFull)
+      ); 
+       // return res.json(updateFull)
     } catch (error) {
       return error.message;
     }
   }
 
+
+
+  
   async upgradeNumberReturnDocument(req, res) {
     const { id, numberReturnDocument, statusExam } = req.body;
     try {

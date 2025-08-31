@@ -1,6 +1,10 @@
+// const { checkExact } = require('express-validator');
+// const { model, Sequelize, transaction } = require('../db');
 const { model } = require('../db');
-const {Directions, User, Сity, Client,UserRegion, Day} = require('../models/models')
-const { Op } = require('sequelize');
+const ApiError = require('../error/ApiError');
+const {Directions, Сity, Client, Delivery, DeliveryNumber, DirectionsRady, Citydirectionsredy } = require('../models/modelsMapDirections')
+const {User} = require('../models/models')
+const { Op, Sequelize } = require('sequelize');
 class DirectionsController {
   async createDirections(req, res) {
     try {
@@ -10,17 +14,28 @@ class DirectionsController {
     } catch (error) {
       console.log(error);
     }
-  }
+  } 
 
+  async allUserIdforDirections(req, res) {
+    const userid = await User.findAll({
+      attributes: ["id"],
+      raw: true,
+      where: {
+        role: "MANAGER",
+      },
+    });
+
+    return res.json(userid);
+  }
   async createCity(req, res) {
     try {
-      const { city, region, directionid, user_id } = req.body;
+      // Удалил region и     user_id,
+      const { city, directionid, day } = req.body;
 
       const newCity = await Сity.create({
         city,
-        region,
         directionid,
-        user_id,
+        day,
       });
       return res.json(newCity);
     } catch (error) {}
@@ -33,6 +48,7 @@ class DirectionsController {
         payment,
         address,
         contact,
+        directionid,
         manager,
         cityid,
         weightusedbattery,
@@ -44,6 +60,7 @@ class DirectionsController {
         payment,
         address,
         contact,
+        directionid,
         manager,
         cityid,
         weightusedbattery,
@@ -63,42 +80,116 @@ class DirectionsController {
       const checkNumder = await DeliveryNumber.findOne({
         where: { dateofcreation },
       });
+      const newDeliveryNumber = await DeliveryNumber.create({
+        dateofcreation,
+      });
+      return res.json(newDeliveryNumber);
+
       if (!checkNumder) {
         const newDeliveryNumber = await DeliveryNumber.create({
           dateofcreation,
         });
-        return res.json(newDeliveryNumber);
       }
     } catch (error) {
       console.log(error);
     }
   }
 
-  async createDirectionsRady(req, res) {
+  async updateDeliveryNumber(req, res) {
     try {
-      const { arrayDirections } = req.body;
+      const { id } = req.body;
 
-      const newDirectionsRady = await DirectionsRady.bulkCreate(
-        arrayDirections
+      const checkNumder = await DeliveryNumber.update(
+        {
+          status: "Arhive",
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
       );
-      return res.json(newDirectionsRady);
+      return res.json(checkNumder);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async createCityDirectionsRady(req, res) {
+  async createDirectionsRady(req, res, next) {
     try {
-      const { cityid, directionsredyid } = req.body;
-      const checkCitydirectionsredy = await Citydirectionsredy.findOne({
-        where: { cityid: cityid, directionsredyid: directionsredyid },
+      const { deliverynumberid, dateofcreation, arrayDirections } = req.body;
+
+      const checkDirectionsRady = await DirectionsRady.findOne({
+        where: {
+          deliverynumberid: deliverynumberid,
+          dateofcreation: dateofcreation,
+        },
       });
-      if (checkCitydirectionsredy) {
-        return;
+      if (checkDirectionsRady) {
+        console.log("Запись есть");
       } else {
+        const newDirectionsRady = await DirectionsRady.bulkCreate(
+          arrayDirections
+        );
+        return res.json(newDirectionsRady);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // async createDirectionsRadyTwo(req, res) {
+  //   try {
+  //     const {dirredyid, todaysdate, statusDirectios} = req.body;
+
+  //     const checkDirectionsRady = await DirectionsRady.findOne({
+  //       where: {
+  //         directionid: Number(dirredyid),
+  //       },
+  //     });
+
+  //     if (checkDirectionsRady) {
+  //        const newDirectionsRady = await DirectionsRady.update(
+  //          {
+  //           statusDirectios: statusDirectios
+  //          },
+  //          {
+  //            where: {
+  //              directionid: Number(dirredyid),
+  //              dateofcreation: todaysdate,
+  //         statusDirections: 'Arhive'
+
+  //            },
+  //          }
+  //        );
+  //       return res.json(newDirectionsRady);
+  //     } else {
+  //       // const newDirectionsRady = await DirectionsRady.create({
+  //       //   region: reg,
+  //       //   day: day,
+  //       //   directionid: Number(dirredyid),
+  //       //   dateofcreation: todaysdate,
+  //       //   deliverynumberid: Number(deliverynumberid),
+  //       // });
+  //       // return res.json(newDirectionsRady);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
+  async createCityDirectionsRady(req, res, next) {
+    try {
+      const { cId, dirId } = req.body;
+
+      const checkCitydirectionsredy = await Citydirectionsredy.findOne({
+        where: { cityid: Number(cId), directionsredyid: Number(dirId) },
+      });
+
+      if (!checkCitydirectionsredy) {
         const newCityDirectionsRady = await Citydirectionsredy.create({
-          cityid: Number(cityid),
-          directionsredyid: Number(directionsredyid),
+          cityid: Number(cId),
+          directionsredyid: Number(dirId),
         });
         return res.json(newCityDirectionsRady);
       }
@@ -106,6 +197,25 @@ class DirectionsController {
       console.log(error);
     }
   }
+
+  //   async createAllCityDirectionsRady(req, res, next) {
+  //   try {
+  //     const { allCityDirectionsRady } = req.body;
+  //     const checkCitydirectionsredy = await Citydirectionsredy.findOne({
+  //       where: { cityid: Number(cId), directionsredyid: Number(dirId) },
+  //     });
+  //     // if (checkCitydirectionsredy) {
+  //     // // next (console.log("Запись уже есть"))
+  //     // } else {
+  //       const newAllCityDirectionsRady = await Citydirectionsredy.bulkCreate(
+  //         allCityDirectionsRady
+  //       );
+  //       return res.json(newAllCityDirectionsRady);
+  //     // }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
   async removeClient(req, res) {
     const { id } = req.body;
@@ -136,15 +246,20 @@ class DirectionsController {
         weightnewbatteries,
         comment,
         dateofcreation,
+        directionsredyid,
+        citydirectionsradyId,
       } = req.body;
-      // const checkwDelivery = await Delivery.findOne({ where: { client } });
-      // if (checkwDelivery) {
-      //   return next(
-      //     ApiError.badRequest(
-      //       'Клиент. уже в доставке. Отредактируйте данные в разделе "Готовы к отгрузке"'
-      //     )
-      //   );
-      // }
+      const checkwDelivery = await Delivery.findOne({
+        where: { dateofcreation: dateofcreation, clientid: clientid },
+      });
+      if (checkwDelivery) {
+        return next(
+          ApiError.badRequest(
+            'Клиент. уже в доставке. Отредактируйте данные в разделе "Готовы к отгрузке"'
+          )
+        );
+      }
+
       const newDelivery = await Delivery.create({
         payment,
         client,
@@ -154,24 +269,13 @@ class DirectionsController {
         manager,
         cityid,
         clientid,
-        weightusedbattery,
-        weightnewbatteries,
+        weightusedbattery: weightusedbattery,
+        weightnewbatteries: weightnewbatteries,
         comment,
         dateofcreation,
+        directionsredyid,
+        citydirectionsredyId: citydirectionsradyId,
       });
-
-      // const id = directionid;
-      // await Directions.update(
-      //   {
-      //     statusDirections: "Delivery",
-      //   },
-      //   {
-      //     where: {
-      //       id: id,
-      //     },
-      //   }
-      // );
-
       return res.json(newDelivery);
     } catch (error) {
       console.log(error);
@@ -179,7 +283,7 @@ class DirectionsController {
   }
 
   async removeDelivery(req, res) {
-    const { id, iddirection } = req.body;
+    const { id, iddirection, dateCreate } = req.body;
 
     try {
       const check = await Delivery.findOne({
@@ -201,12 +305,13 @@ class DirectionsController {
             },
           });
           if (!checkId) {
-            await DirectionsRady.destroy(
-              // {
-              //   statusDirections: "",
-              // },
+            await DirectionsRady.update(
+              {
+                statusDirections: "Arhive",
+              },
               {
                 where: {
+                  dateofcreation: dateCreate,
                   directionid: iddirection,
                 },
               }
@@ -303,7 +408,7 @@ class DirectionsController {
             {
               model: Сity,
               as: "city",
-              attributes: ["id", "city", "region"],
+              attributes: ["id", "city"],
               include: [
                 {
                   model: Client,
@@ -311,8 +416,8 @@ class DirectionsController {
                 },
               ],
             },
-          ],  
-        }); 
+          ],
+        });
         return res.json(direction);
       } catch (error) {
         console.log(error);
@@ -320,128 +425,496 @@ class DirectionsController {
     }
   }
 
-  async getAllMonday(req, res) {   
-    try {
-       let { userid, day } = req.query;
-       let days;
-       days = await Directions.findAll({
-         where: {
-          userid: {
-             [Op.contains]: Number(userid)
-           },
-           day: {
-             [Op.eq]: day,
-           },
-           
-         },
-         include: [
-           {
-             model: Сity,
-             as: "city",
-             attributes: ["id", "city", "region"],
-             include: [
-               {
-                 model: Client,
-                 as: "client",
-                 where: {
-                   manager: userid,
-                 },
-               },
-             ],
-           },
-         ],
-       });
-       return res.json(days);
-      
-    } catch (error) {
-      
-    }
+  async getTodaysDirections(req, res) {
+    const { days } = req.query;
 
+    try {
+      const allTodaysDirections = await Directions.findAll({
+        where: { day: days },
+      });
+      return res.json(allTodaysDirections);
+    } catch (error) {}
   }
 
-  
-  // async getAllMonday(req, res) {
-  //   let { id, userid ,day, } = req.query;
+  async getOneTodaysDirections(req, res) {
+    const { regionid, todaysdate } = req.query;
 
-  //   let days;
+    try {
+      const oneTodaysDirections = await DirectionsRady.findOne({
+        where: {
+          directionid: Number(regionid),
+          dateofcreation: todaysdate,
+        },
+      });
+      return res.json(oneTodaysDirections);
+    } catch (error) {}
+  }
 
-  //   if (!id) {
-  //     days = await UserRegion.findAll(
-  //       {
-  //       // where: {
-  //       //  [Op.and]: [
-  //       //    {userid: userid},
-  //       //  { day: day}
-      
-  //       //  ]
-  //       // }
-  //       // ,
+  async getOneRegions(req, res) {
+    const { id } = req.query;
+    try {
+      const OneRegion = await Directions.findOne({
+        where: {
+          id,
+        },
+      });
+      return res.json(OneRegion);
+    } catch (error) {
+      return error.message;
+    }
+  }
+
+  async getOneDeliveryNumber(req, res, next) {
+    const { dateofcreation } = req.query;
+    try {
+      const OneDeliveryNumber = await DeliveryNumber.findOne({
+        where: {
+          dateofcreation,
+        },
+      });
+      if (!OneDeliveryNumber) {
+        return;
+      } else {
+        return res.json(OneDeliveryNumber);
+      }
+    } catch (error) {
+      return error.message;
+    }
+  }
+
+  async getAllToday(req, res) {
+    try {
+      let { userid, day } = req.query;
+      let days;
+      days = await Directions.findAll({
+        order: [["region", "ASC"]],
+        where: {
+          userid: {
+            // [Op.contains]: Number(userid),
+            [Op.any]: Sequelize.literal("ARRAY[userid]"),
+          },
+          day: {
+            [Op.eq]: day,
+          },
+        },
+        include: [
+          {
+            model: Сity,
+            as: "city",
+            //attributes: ["id", "city", "region"],
+            include: [
+              {
+                model: Client,
+                as: "client",
+                where: {
+                  manager: userid,
+                },
+              },
+            ],
+          },
+        ],
+      });
+      return res.json(days);
+    } catch (error) {}
+  }
+
+  async getAllDelivery(req, res) {
+    try {
+      let {} = req.query;
+      let allDelivery;
+      allDelivery = await Directions.findAll({
+        order: [["region", "ASC"]],
+        where: {
+          statusDirections: "Delivery",
+        },
+        include: [
+          {
+            model: Сity,
+            as: "city",
+            // attributes: ["id", "city", "region"],
+            include: [
+              {
+                model: Delivery,
+                as: "delivery",
+                where: {
+                  statusClient: "Delivery",
+                },
+              },
+            ],
+          },
+        ],
+      });
+
+      return res.json(allDelivery);
+    } catch (error) {}
+  }
+
+  // async getAllDeliveryRedy(req, res) {
+  //   try {
+  //     let {} = req.query;
+  //     let allDelivery;
+  //     allDelivery = await DeliveryNumber.findAll({
+  //       //  order: [['region', 'ASC']],
+  //       where: {
+  //         status: "Delivery",
+  //       },
+
   //       include: [
   //         {
-  //           model: Directions,
-  //           as: "userId",
-  //           attributes: ["id", "city", "region"],
+  //           model: DirectionsRady,
+  //           as: "directionsredy",
+  //           // where: { statusDirections: "Delivery" },
   //           include: [
   //             {
-  //               model: Client,
-  //               as: "client",
+  //               model: Citydirectionsredy,
+  //               as: "citydirectionsredy",
+
+  //               include: [
+  //                 {
+  //                   model: Сity,
+  //                   as: "city",
+
+  //                 },
+  //                   {  model: Delivery,
+  //                     as: "delivery",
+
+  //                   }
+  //                   ],
   //             },
   //           ],
   //         },
   //       ],
-  //     }
-  //   );
-  //   }
-  //   // console.log(days)
-  //   return res.json(days);
+  //     });
+
+  //     return res.json(allDelivery);
+  //   } catch (error) {}
   // }
 
-  async getAllCity(req, res) {
-    let {id} = req.query;
-    let allcity;
-    if(!id) {
-      allcity = await Сity.findAll()
-    }
+  async getAllDeliveryRedy(req, res) {
+    try {
+      let {} = req.query;
+      let allDelivery;
+      allDelivery = await DeliveryNumber.findAll({
+        //  order: [['region', 'ASC']],
+        where: {
+          status: "Delivery",
+        },
 
-    return res.json(allcity)
+        include: [
+          {
+            model: DirectionsRady,
+            as: "directionsredy",
+            // where: { statusDirections: "Delivery" },
+            include: [
+              {
+                model: Citydirectionsredy,
+                as: "citydirectionsredy",
+                include: [
+                  {
+                    model: Сity,
+                    as: "city",
+                  },
+                  { model: Delivery, as: "delivery" },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      return res.json(allDelivery);
+    } catch (error) {}
   }
 
-  // async getAllregions(req, res) {
-  //   let { directionId } = req.query;
+  async getArhiveDelivery(req, res) {
+    try {
+      let {} = req.query;
+      let allDelivery;
+      allDelivery = await DeliveryNumber.findAll({
+        //  order: [['region', 'ASC']],
+        where: {
+          status: "Arhive",
+        },
 
-  //   if (!directionId) {
-  //     try {
-  //       const direction = await Directions.findAll({
+        include: [
+          {
+            model: DirectionsRady,
+            as: "directionsredy",
+            // where: { statusDirections: "Delivery" },
+            include: [
+              {
+                model: Citydirectionsredy,
+                as: "citydirectionsredy",
 
-  //         include: [
-  //           {
-  //             model: Day,
-  //             as: "day",
+                include: [
+                  {
+                    model: Сity,
+                    as: "city",
+                  },
+                  { model: Delivery, as: "delivery" },
+                ],
+              },
+            ],
+          },
+        ],
+      });
 
-  //         include: [
-  //           {
-  //             model: Сity,
-  //             as: "city",
-  //             attributes: ["id", "city", "region"],
-  //             include: [
-  //               {
-  //                 model: Client,
-  //                 as: "client"
-  //               }
-  //             ]
-  //           },
-  //         ],
-  //           }
-  //         ]
+      return res.json(allDelivery);
+    } catch (error) {}
+  }
+  // async getOneDelivery(req, res) {
+  //   try {
+  //     let { id } = req.query;
+  //     let oneDelivery;
+  //     oneDelivery = await Directions.findOne({
+  //       where: {
+  //         // statusDirections: 'Delivery',
+  //         id,
+  //       },
+  //       include: [
+  //         {
+  //           model: Сity,
+  //           as: "city",
+  //           //  attributes: ["id", "city", "region"],
+  //           include: [
+  //             {
+  //               model: Delivery,
+  //               as: "delivery",
+  //               where: {
+  //                 statusClient: "Delivery",
+  //               },
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //     });
 
-  //       });
-
-  //       return res.json(direction);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
+  //     return res.json(oneDelivery);
+  //   } catch (error) {}
   // }
+
+  async getOneDelivery(req, res) {
+    try {
+      let { id } = req.query;
+      let oneDelivery;
+      oneDelivery = await DeliveryNumber.findOne({
+        where: {
+          // statusDirections: 'Delivery',
+          id,
+        },
+       include: [
+          {
+            model: DirectionsRady,
+            as: "directionsredy",
+            // where: { statusDirections: "Delivery" },
+            include: [
+              {
+                model: Citydirectionsredy,
+                as: "citydirectionsredy",
+                include: [
+                  {
+                    model: Сity,
+                    as: "city",
+                  },
+                  { model: Delivery, as: "delivery" },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      return res.json(oneDelivery);
+    } catch (error) {}
+  }
+
+  async getOneCityDirectionsRady(req, res) {
+    try {
+      let { dirId, cId } = req.query;
+      let oneDelivery;
+      oneDelivery = await Citydirectionsredy.findOne({
+        where: {
+          directionsredyid: dirId,
+          cityid: cId,
+        },
+      });
+
+      return res.json(oneDelivery);
+    } catch (error) {}
+  }
+  async getAllDelivery(req, res) {
+    try {
+      let {} = req.query;
+      let allDelivery;
+      allDelivery = await DeliveryNumber.findAll({
+        //  order: [['region', 'ASC']],
+        where: {
+          status: "Delivery",
+        },
+
+        include: [
+          {
+            model: DirectionsRady,
+            as: "directionsredy",
+            where: { statusDirections: "Arhive" },
+            include: [
+              {
+                model: Citydirectionsredy,
+                as: "citydirectionsredy",
+                include: [
+                  {
+                    model: Сity,
+                    as: "city",
+                    include: [
+                      {
+                        model: Delivery,
+                        as: "delivery",
+                        // where:{statusClient: 'Arhive'}
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      return res.json(allDelivery);
+    } catch (error) {}
+  }
+  async getOneClient(req, res) {
+    const { id } = req.query;
+    try {
+      const OneClient = await Client.findOne({
+        where: {
+          id,
+        },
+      });
+      return res.json(OneClient);
+    } catch (error) {
+      return error.message;
+    }
+  }
+
+  async getOneClientDeliveryReady(req, res) {
+    const { id } = req.query;
+    try {
+      const OneClientDelivery = await Delivery.findOne({
+        where: {
+          id: id,
+        },
+      });
+      return res.json(OneClientDelivery);
+    } catch (error) {
+      return error.message;
+    }
+  }
+
+  async updateClientDelivery(req, res) {
+    try {
+      const {
+        id,
+        payment,
+        client,
+        address,
+        contact,
+        directionid,
+        manager,
+        cityid,
+        weightusedbattery,
+        weightnewbatteries,
+        comment,
+      } = req.body;
+
+      const updateClient = await Delivery.update(
+        {
+          payment: payment,
+          client: client,
+          address: address,
+          contact: contact,
+          directionid: directionid,
+          manager: manager,
+          cityid: cityid,
+          weightusedbattery: weightusedbattery,
+          weightnewbatteries: Number(weightnewbatteries),
+          comment: comment,
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
+
+      return res.json(updateClient);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getAllDirectionsReadyOfCity(req, res) {
+    try {
+      let {} = req.query;
+      let allDelivery;
+      allDelivery = await DirectionsRady.findAll({
+        where: {
+          statusDirections: "Delivery",
+        },
+        include: [
+          {
+            model: Сity,
+            as: "city",
+            // attributes: ["id", "city", "region"],
+            include: [
+              {
+                model: Delivery,
+                as: "delivery",
+                where: {
+                  statusClient: "Delivery",
+                },
+              },
+            ],
+          },
+        ],
+      });
+
+      return res.json(allDelivery);
+    } catch (error) {}
+  }
+  async getAllCity(req, res) {
+    let { directionid } = req.query;
+    let allcity;
+    // if (!id) {
+    try {
+      allcity = await Сity.findAll({
+        where: {
+          directionid: directionid,
+        },
+      });
+    } catch (error) {}
+
+    // }
+
+    return res.json(allcity);
+  }
+
+  async getCitysofDay(req, res) {
+    let { day } = req.query;
+    let allcity;
+    // if (!id) {
+    try {
+      allcity = await Сity.findAll({
+        where: {
+          day: day,
+        },
+      });
+    } catch (error) {}
+
+    // }
+
+    return res.json(allcity);
+  }
 }
 
 
