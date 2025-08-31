@@ -56,6 +56,243 @@ class DirectionsController {
     }
   }
 
+  async createDeliveryNumber(req, res) {
+    try {
+      const { dateofcreation } = req.body;
+
+      const checkNumder = await DeliveryNumber.findOne({
+        where: { dateofcreation },
+      });
+      if (!checkNumder) {
+        const newDeliveryNumber = await DeliveryNumber.create({
+          dateofcreation,
+        });
+        return res.json(newDeliveryNumber);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async createDirectionsRady(req, res) {
+    try {
+      const { arrayDirections } = req.body;
+
+      const newDirectionsRady = await DirectionsRady.bulkCreate(
+        arrayDirections
+      );
+      return res.json(newDirectionsRady);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async createCityDirectionsRady(req, res) {
+    try {
+      const { cityid, directionsredyid } = req.body;
+      const checkCitydirectionsredy = await Citydirectionsredy.findOne({
+        where: { cityid: cityid, directionsredyid: directionsredyid },
+      });
+      if (checkCitydirectionsredy) {
+        return;
+      } else {
+        const newCityDirectionsRady = await Citydirectionsredy.create({
+          cityid: Number(cityid),
+          directionsredyid: Number(directionsredyid),
+        });
+        return res.json(newCityDirectionsRady);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async removeClient(req, res) {
+    const { id } = req.body;
+    try {
+      const delClient = await Client.destroy({
+        where: {
+          id,
+        },
+      });
+      return res.json(delClient);
+    } catch (error) {
+      // error.console.log(error)
+    }
+  }
+
+  async createDelivery(req, res, next) {
+    try {
+      const {
+        payment,
+        client,
+        address,
+        contact,
+        directionid,
+        manager,
+        cityid,
+        clientid,
+        weightusedbattery,
+        weightnewbatteries,
+        comment,
+        dateofcreation,
+      } = req.body;
+      // const checkwDelivery = await Delivery.findOne({ where: { client } });
+      // if (checkwDelivery) {
+      //   return next(
+      //     ApiError.badRequest(
+      //       'Клиент. уже в доставке. Отредактируйте данные в разделе "Готовы к отгрузке"'
+      //     )
+      //   );
+      // }
+      const newDelivery = await Delivery.create({
+        payment,
+        client,
+        address,
+        contact,
+        directionid,
+        manager,
+        cityid,
+        clientid,
+        weightusedbattery,
+        weightnewbatteries,
+        comment,
+        dateofcreation,
+      });
+
+      // const id = directionid;
+      // await Directions.update(
+      //   {
+      //     statusDirections: "Delivery",
+      //   },
+      //   {
+      //     where: {
+      //       id: id,
+      //     },
+      //   }
+      // );
+
+      return res.json(newDelivery);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async removeDelivery(req, res) {
+    const { id, iddirection } = req.body;
+
+    try {
+      const check = await Delivery.findOne({
+        where: { directionid: iddirection },
+      });
+      if (check) {
+        const delDelivery = await Delivery.destroy({
+          where: {
+            id: id,
+          },
+        });
+
+        if (delDelivery) {
+          const checkId = await Delivery.findOne({
+            where: {
+              directionid: {
+                [Op.eq]: iddirection,
+              },
+            },
+          });
+          if (!checkId) {
+            await DirectionsRady.destroy(
+              // {
+              //   statusDirections: "",
+              // },
+              {
+                where: {
+                  directionid: iddirection,
+                },
+              }
+            );
+          }
+        }
+
+        return res.json(delDelivery);
+      }
+    } catch (error) {
+      // error.console.log(error)
+    }
+  }
+
+  async removeClient(req, res) {
+    const { id } = req.body;
+    try {
+      const delClient = await Client.destroy({
+        where: {
+          id,
+        },
+      });
+      return res.json(delClient);
+    } catch (error) {
+      // error.console.log(error)
+    }
+  }
+
+  async addStatusDelivery(req, res) {
+    try {
+      const { id, statusDelivery } = req.body;
+      const newDelivery = await Client.update(
+        {
+          statusDelivery: statusDelivery,
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
+
+      return res.json(newDelivery);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async updateClient(req, res) {
+    try {
+      const {
+        id,
+        payment,
+        client,
+        address,
+        contact,
+        directionid,
+        manager,
+        cityid,
+        comment,
+      } = req.body;
+
+      const updateClient = await Client.update(
+        {
+          payment: payment,
+          client: client,
+          address: address,
+          contact: contact,
+          directionid: directionid,
+          manager: manager,
+          cityid: cityid,
+          comment: comment,
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
+
+      return res.json(updateClient);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async getAllregions(req, res) {
     let { directionId } = req.query;
 
