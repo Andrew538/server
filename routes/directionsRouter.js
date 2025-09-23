@@ -49,4 +49,7 @@ router.get('/getonecitydirectionrady', directionsController.getOneCityDirections
 
 router.get('/getalldeliveryarhive', directionsController.getArhiveDelivery)
 
+// Роут для общего веса, пока не трогать
+// router.get('/gettotalweightofnew', directionsController.gettoTalWeightOfNew)
+
 module.exports = router

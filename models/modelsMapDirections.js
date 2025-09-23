@@ -41,10 +41,12 @@ const Client = sequelize.define('client', {
     cityid:{type: DataTypes.INTEGER, primaryKey: false, autoIncrement: false},
     weightusedbattery:{type: DataTypes.INTEGER, primaryKey: false, autoIncrement: false,defaultValue: 0, allowNull: true},
     weightnewbatteries :{type: DataTypes.INTEGER, primaryKey: false, autoIncrement: false, defaultValue: 0, allowNull: true},
-    comment: {type: DataTypes.STRING, allowNull: true},    
+    comment: {type: DataTypes.STRING, allowNull: true},
+    priceofusedbattery:{type: DataTypes.STRING, primaryKey: false, autoIncrement: false, defaultValue: ""},
     statusDelivery: {type: DataTypes.STRING, allowNull: true},
 }) 
 
+// Client.sync({ alter: true })
  
 const DeliveryNumber = sequelize.define('deliverynumber', {
     id:{type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -144,6 +146,8 @@ const Delivery = sequelize.define('delivery', {
     dateofcreation:{type: DataTypes.STRING,  allowNull: false, unique: false},
     directionsredyid:{type: DataTypes.INTEGER,  allowNull: false},
     citydirectionsredyId:{type: DataTypes.INTEGER,  allowNull: true},
+    priceofusedbattery:{type: DataTypes.STRING, primaryKey: false, autoIncrement: false, defaultValue: ""},
+ 
 //  deliverynumberid: {  
 //       type: DataTypes.INTEGER,
 //       primaryKey: false,
@@ -238,7 +242,7 @@ Citydirectionsredy.hasMany(Delivery, {
   foreignKey: "citydirectionsredyId",
   as: "delivery",
 });    
- 
+Delivery.belongsTo(Citydirectionsredy);  
 Сity.hasMany(Delivery, {
     foreignKey: 'cityid',
     as: 'delivery'
@@ -260,12 +264,12 @@ Client.hasOne(User)
 
 module.exports = {
   User,
-    Directions,
-    Сity,
-    Client,
-    Delivery,
-    DeliveryNumber,
-    DirectionsRady,
-    Citydirectionsredy
+  Directions,
+  Сity,
+  Client,
+  Delivery,
+  DeliveryNumber,
+  DirectionsRady,
+  Citydirectionsredy
 
 }

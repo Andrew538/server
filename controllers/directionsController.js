@@ -5,7 +5,15 @@ const ApiError = require('../error/ApiError');
 const {Directions, Сity, Client, Delivery, DeliveryNumber, DirectionsRady, Citydirectionsredy } = require('../models/modelsMapDirections')
 const {User} = require('../models/models')
 const { Op, Sequelize } = require('sequelize');
+
+
+
+
+
 class DirectionsController {
+
+  
+
   async createDirections(req, res) {
     try {
       const { region, day, userid } = req.body;
@@ -14,7 +22,7 @@ class DirectionsController {
     } catch (error) {
       console.log(error);
     }
-  } 
+  }
 
   async allUserIdforDirections(req, res) {
     const userid = await User.findAll({
@@ -248,6 +256,7 @@ class DirectionsController {
         dateofcreation,
         directionsredyid,
         citydirectionsradyId,
+        priceofusedbattery
       } = req.body;
       const checkwDelivery = await Delivery.findOne({
         where: { dateofcreation: dateofcreation, clientid: clientid },
@@ -275,6 +284,7 @@ class DirectionsController {
         dateofcreation,
         directionsredyid,
         citydirectionsredyId: citydirectionsradyId,
+        priceofusedbattery
       });
       return res.json(newDelivery);
     } catch (error) {
@@ -372,6 +382,7 @@ class DirectionsController {
         manager,
         cityid,
         comment,
+        priceofusedbattery
       } = req.body;
 
       const updateClient = await Client.update(
@@ -384,6 +395,7 @@ class DirectionsController {
           manager: manager,
           cityid: cityid,
           comment: comment,
+          priceofusedbattery: priceofusedbattery
         },
         {
           where: {
@@ -548,7 +560,7 @@ class DirectionsController {
       return res.json(allDelivery);
     } catch (error) {}
   }
-
+//  НЕ ТРОГАТЬ РАБОТАЕТ
   // async getAllDeliveryRedy(req, res) {
   //   try {
   //     let {} = req.query;
@@ -589,8 +601,11 @@ class DirectionsController {
   //     return res.json(allDelivery);
   //   } catch (error) {}
   // }
+    //  
 
-  async getAllDeliveryRedy(req, res) {
+
+
+    async getAllDeliveryRedy(req, res) {
     try {
       let {} = req.query;
       let allDelivery;
@@ -599,32 +614,102 @@ class DirectionsController {
         where: {
           status: "Delivery",
         },
-
+        // attributes: [
+        //   // 'id'
+        //   // [Sequelize.fn('SUM', Sequelize.col('delivery.weightnewbatteries')), 'totalLikes']
+        // ],
         include: [
           {
             model: DirectionsRady,
             as: "directionsredy",
             // where: { statusDirections: "Delivery" },
+
+          // attributes: [
+          //         "id",
+          //         "directionid",
+          //         "dateofcreation",
+          //         "deliverynumberid",
+          //       ],
+
+
             include: [
               {
                 model: Citydirectionsredy,
                 as: "citydirectionsredy",
+                // attributes: [
+                //   "id",
+                //   "cityid",
+                //   "directionsredyid",
+                //   "dateofcreation",
+                // ],
+
                 include: [
                   {
                     model: Сity,
                     as: "city",
+                    // attributes: ["id"],
                   },
-                  { model: Delivery, as: "delivery" },
+                  {
+                    model: Delivery,
+                    as: "delivery",
+                    
+
+                    // group: ["cityid"],
+                  },
                 ],
               },
             ],
+        group: 'DeliveryNumber.id'
+
           },
+          
         ],
       });
 
       return res.json(allDelivery);
     } catch (error) {}
   }
+     
+  // async getAllDeliveryRedy(req, res) {
+  //   try {
+  //     let {} = req.query;
+  //     let allDelivery;
+  //     allDelivery = await DeliveryNumber.findAll({
+  //       //  order: [['region', 'ASC']],
+  //       where: {
+  //         status: "Delivery",
+  //       },
+
+  //       include: [
+  //         {
+  //           model: DirectionsRady,
+  //           as: "directionsredy",
+  //           // where: { statusDirections: "Delivery" },
+  //           include: [
+  //             {
+  //               model: Citydirectionsredy,
+  //               as: "citydirectionsredy",
+               
+  //               include: [
+  //                 {
+  //                   model: Сity,
+  //                   as: "city",
+  //                 },
+  //                 {
+  //                   model: Delivery,
+  //                   as: "delivery",
+                    
+  //                 },
+  //               ],
+  //             },
+  //           ],
+  //         },
+  //       ],
+  //     });
+
+  //     return res.json(allDelivery);
+  //   } catch (error) {}
+  // }
 
   async getArhiveDelivery(req, res) {
     try {
@@ -702,7 +787,7 @@ class DirectionsController {
           // statusDirections: 'Delivery',
           id,
         },
-       include: [
+        include: [
           {
             model: DirectionsRady,
             as: "directionsredy",
@@ -825,6 +910,7 @@ class DirectionsController {
         weightusedbattery,
         weightnewbatteries,
         comment,
+        priceofusedbattery
       } = req.body;
 
       const updateClient = await Delivery.update(
@@ -839,6 +925,7 @@ class DirectionsController {
           weightusedbattery: weightusedbattery,
           weightnewbatteries: Number(weightnewbatteries),
           comment: comment,
+          priceofusedbattery: priceofusedbattery
         },
         {
           where: {
@@ -915,7 +1002,133 @@ class DirectionsController {
 
     return res.json(allcity);
   }
-}
 
+  // async gettoTalWeightOfNew(req, res) {
+  //   try {
+  //     let { dateofcreation, cityid } = req.query;
+
+  //     let sum;
+  //     sum = await Delivery.findOne( {
+  //       // where: {
+  //       //   // dateofcreation: dateofcreation,
+  //       //   // cityid: cityid
+        
+  //       // },
+  //       attributes: [
+  //         [Sequelize.fn('SUM', Sequelize.col('weightnewbatteries')), 'pop']
+  //       ],
+  //       where: {
+  //         dateofcreation: dateofcreation,
+  //         cityid: [8, 7, 6]
+  //       }
+  //     });
+
+  //     return res.json(sum);
+  //   } catch (error) {}
+  // }
+
+  //   const result = await YourMainModel.findAll({
+  //     include: [{
+  //       model: YourNestedModel,
+  //       attributes: [
+  //         [sequelize.fn('SUM', sequelize.col('YourNestedModel.your_column_to_sum')), 'totalSum']
+  //       ]
+  //     }],
+  //     attributes: ['id', 'name'] // Атрибуты родительской модели
+  //   });
+
+
+//РАботает частично
+  
+  // async gettoTalWeightOfNew(req, res) {
+  //   try {
+  //     let { dateofcreation, cityid } = req.query;
+
+  //     let sum;
+  //      sum = await Delivery.findAll({
+  //       // where: {
+  //       // // 
+  //       // dateofcreation: dateofcreation
+  //       // }, 
+  //      attributes:[
+  //       'directionsredyid',
+      
+  //        [Sequelize.fn('SUM', Sequelize.col('weightnewbatteries')), 'itemCount'],
+         
+  //      ],
+      
+       
+  //      group: ['directionsredyid',]
+      
+       
+  //   });
+
+  //     return res.json(sum);
+  //   } catch (error) {}
+  // }
+
+
+
+
+// const Order = sequelize.model("Order"); // Ваша модель заказа
+// const OrderItem = sequelize.model("OrderItem"); // Ваша модель элементов заказа
+
+
+
+
+//  async gettoTalWeightOfNew(req, res) {
+//     try {
+//      let { dateofcreation, cityid } = req.query;
+
+//       let sum;
+//      sum = await Citydirectionsredy.findAll({
+//     attributes: [
+//       'id',
+//       'cityid', 
+//           [Sequelize.fn('SUM', Sequelize.col(`${Delivery}.${weightnewbatteries}`)), 'totalOrderAmount']
+
+//     ],
+
+//        include: [{
+//       model: Delivery,
+//       as: 'delivery',
+//        attributes: [
+//         // 'cityid',
+//         // 'weightnewbatteries',
+//     ],
+    
+//     group: ['Citydirectionsredy.id']
+
+    
+//     }, ],
+      
+    
+   
+   
+//     // group: ['Citydirectionsredy.id'], // Group by user ID to get sum per user
+//   });
+
+//   // console.log(JSON.stringify(sum, null, 2));
+
+//        return res.json(sum);
+//      } catch (error) {}
+//    }
+
+
+
+  async gettoTalWeightOfNew(req, res) {
+    try {
+      let { dateofcreation, cityid } = req.query;
+
+      let sum;
+      
+      return res.json(sum);
+    } catch (error) {}
+  }
+
+   
+   
+
+}
 
 module.exports = new DirectionsController()
