@@ -8,7 +8,7 @@ router.post('/registration', checkRoleMiddleware('ADMIN'), userController.regist
 router.post( '/login', userController.login)
 router.get('/auth', authMiddleware, userController.check)
 router.get('/allmanagers',authMiddleware, userController.allManagers)
-router.post( '/addnewuserindirections', userController.addNewUserinDirections)
+router.post( '/addneuserindirections', userController.addNewUserinDirections)
 
 // router.get('/surname',authMiddleware, userController.getSurname)
 

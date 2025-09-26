@@ -38,28 +38,33 @@ class UserController {
       password: hashPassword,
     });
     if(user.role === 'MANAGER') {
+        const newid =  Update()
+        if(newid) {
+           return next(ApiError.badRequest("Пользователь успешно создан и добавлен в направления")) ;
+        }
          return res.json(user.id)
-    } else if (user) {
+    } if (user) {
       
       return next(ApiError.badRequest("Пользователь успешно создан")) ;
         
     } 
-    // async function Update() {
-    //   await Directions.update(
-    //     {
-    //       userid: Sequelize.fn(
-    //         "jsonb_set",
-    //         Sequelize.col("userid"),
-    //         `{${user.id}}`,
-    //         JSON.stringify(user.id),
-    //         true
-    //       ),
-    //     },
-    //     {
-    //       where: {},
-    //     }
-    //   );
-    // }
+    async function Update() {
+    await Directions.update(
+        {
+          userid: Sequelize.fn(
+            "jsonb_set",
+            Sequelize.col("userid"),
+            `{${user.id}}`,
+            JSON.stringify(user.id),
+            true
+          ),
+        },
+        {
+          where: {},
+        }
+      );
+      
+    }
 
     // const token = generateJwt(user.id, user.email, user.role)
    
@@ -73,6 +78,7 @@ class UserController {
 
       const updateDirection = await Directions.update(
             {
+              
           userid: Sequelize.fn(
             "jsonb_set",
             Sequelize.col("userid"),

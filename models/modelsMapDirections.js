@@ -15,7 +15,7 @@ const Directions = sequelize.define('directions', {
     id:{type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     region: {type: DataTypes.STRING, allowNull: false},
     day: {type: DataTypes.INTEGER, allowNull: false},
-    userid:{type: DataTypes.JSONB, primaryKey: false, autoIncrement: false},
+    userid:{type: DataTypes.JSONB, primaryKey: false, autoIncrement: false, defaultValue: []},
     // statusDirections: {type: DataTypes.STRING,  allowNull: true},
     // directionid:{type: DataTypes.INTEGER,  allowNull: true, autoIncrement: false, },
 })  
@@ -28,7 +28,7 @@ const Сity = sequelize.define('city', {
     day: {type: DataTypes.INTEGER, allowNull: false},
 
     // user_id:{type: DataTypes.INTEGER, primaryKey: false, autoIncrement: false},
-})        
+})         
     
 const Client = sequelize.define('client', {
     id:{type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -77,6 +77,8 @@ const DirectionsRady = sequelize.define(
       primaryKey: false,
       autoIncrement: false,
     },
+    weightnewbatteries:{type: DataTypes.JSONB, primaryKey: false, autoIncrement: false, defaultValue: []},
+    weightusedbattery:{type: DataTypes.JSONB, primaryKey: false, autoIncrement: false, defaultValue: []},
   }, 
 //  {
 //     sequelize,
@@ -161,7 +163,8 @@ const Delivery = sequelize.define('delivery', {
     id:{type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }, 
     cityid:{type: DataTypes.INTEGER, allowNull: false},
     directionsredyid:{type: DataTypes.INTEGER,  allowNull: false},
-
+    weightnewbatteries:{type: DataTypes.JSONB, primaryKey: false, autoIncrement: false, defaultValue: []},
+    weightusedbattery:{type: DataTypes.JSONB, primaryKey: false, autoIncrement: false, defaultValue: []},
  })
   
 

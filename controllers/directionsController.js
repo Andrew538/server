@@ -258,9 +258,12 @@ class DirectionsController {
         citydirectionsradyId,
         priceofusedbattery
       } = req.body;
+
       const checkwDelivery = await Delivery.findOne({
         where: { dateofcreation: dateofcreation, clientid: clientid },
       });
+    await  Update()
+    await UpdateDirectionsReady()
       if (checkwDelivery) {
         return next(
           ApiError.badRequest(
@@ -268,7 +271,6 @@ class DirectionsController {
           )
         );
       }
-
       const newDelivery = await Delivery.create({
         payment,
         client,
@@ -286,6 +288,63 @@ class DirectionsController {
         citydirectionsredyId: citydirectionsradyId,
         priceofusedbattery
       });
+
+            async function Update() {
+        await Citydirectionsredy.update(
+          {
+            weightusedbattery: Sequelize.fn(
+              "jsonb_set",
+              Sequelize.col("weightusedbattery"),
+              `{${weightusedbattery}}`,
+              JSON.stringify(Number(weightusedbattery)),
+              true
+            ),
+            weightnewbatteries: Sequelize.fn(
+              "jsonb_set",
+              Sequelize.col("weightnewbatteries"),
+              `{${weightnewbatteries}}`,
+              JSON.stringify(Number(weightnewbatteries)),
+              true
+            ),
+          },
+          {
+            where: {
+              cityid:cityid,
+              directionsredyid:directionsredyid,
+
+            },
+          }
+        );
+      }
+      
+            async function UpdateDirectionsReady() {
+        await DirectionsRady.update(
+          {
+            weightusedbattery: Sequelize.fn(
+              "jsonb_set",
+              Sequelize.col("weightusedbattery"),
+              `{${weightusedbattery}}`,
+              JSON.stringify(Number(weightusedbattery)),
+              true
+            ),
+            weightnewbatteries: Sequelize.fn(
+              "jsonb_set",
+              Sequelize.col("weightnewbatteries"),
+              `{${weightnewbatteries}}`,
+              JSON.stringify(Number(weightnewbatteries)),
+              true
+            ),
+          },
+          {
+            where: {
+              
+              id:directionsredyid,
+              dateofcreation:dateofcreation
+
+            },
+          }
+        );
+      }
       return res.json(newDelivery);
     } catch (error) {
       console.log(error);
@@ -417,7 +476,7 @@ class DirectionsController {
       try {
         const direction = await Directions.findAll({
           include: [
-            {
+            { 
               model: Сity,
               as: "city",
               attributes: ["id", "city"],
@@ -561,51 +620,7 @@ class DirectionsController {
     } catch (error) {}
   }
 //  НЕ ТРОГАТЬ РАБОТАЕТ
-  // async getAllDeliveryRedy(req, res) {
-  //   try {
-  //     let {} = req.query;
-  //     let allDelivery;
-  //     allDelivery = await DeliveryNumber.findAll({
-  //       //  order: [['region', 'ASC']],
-  //       where: {
-  //         status: "Delivery",
-  //       },
-
-  //       include: [
-  //         {
-  //           model: DirectionsRady,
-  //           as: "directionsredy",
-  //           // where: { statusDirections: "Delivery" },
-  //           include: [
-  //             {
-  //               model: Citydirectionsredy,
-  //               as: "citydirectionsredy",
-
-  //               include: [
-  //                 {
-  //                   model: Сity,
-  //                   as: "city",
-
-  //                 },
-  //                   {  model: Delivery,
-  //                     as: "delivery",
-
-  //                   }
-  //                   ],
-  //             },
-  //           ],
-  //         },
-  //       ],
-  //     });
-
-  //     return res.json(allDelivery);
-  //   } catch (error) {}
-  // }
-    //  
-
-
-
-    async getAllDeliveryRedy(req, res) {
+  async getAllDeliveryRedy(req, res) {
     try {
       let {} = req.query;
       let allDelivery;
@@ -614,61 +629,105 @@ class DirectionsController {
         where: {
           status: "Delivery",
         },
-        // attributes: [
-        //   // 'id'
-        //   // [Sequelize.fn('SUM', Sequelize.col('delivery.weightnewbatteries')), 'totalLikes']
-        // ],
+
         include: [
           {
             model: DirectionsRady,
             as: "directionsredy",
             // where: { statusDirections: "Delivery" },
-
-          // attributes: [
-          //         "id",
-          //         "directionid",
-          //         "dateofcreation",
-          //         "deliverynumberid",
-          //       ],
-
-
             include: [
               {
                 model: Citydirectionsredy,
                 as: "citydirectionsredy",
-                // attributes: [
-                //   "id",
-                //   "cityid",
-                //   "directionsredyid",
-                //   "dateofcreation",
-                // ],
-
+                 
                 include: [
                   {
                     model: Сity,
                     as: "city",
-                    // attributes: ["id"],
-                  },
-                  {
-                    model: Delivery,
-                    as: "delivery",
-                    
 
-                    // group: ["cityid"],
                   },
-                ],
+                    {  model: Delivery,
+                      as: "delivery",
+
+                    }
+                    ],
               },
             ],
-        group: 'DeliveryNumber.id'
-
           },
-          
         ],
       });
 
       return res.json(allDelivery);
     } catch (error) {}
   }
+     
+
+
+
+  //   async getAllDeliveryRedy(req, res) {
+  //   try {
+  //     let {} = req.query;
+  //     let allDelivery;
+  //     allDelivery = await DeliveryNumber.findAll({
+  //       //  order: [['region', 'ASC']],
+  //       where: {
+  //         status: "Delivery",
+  //       },
+  //       // attributes: [
+  //       //   // 'id'
+  //       //   // [Sequelize.fn('SUM', Sequelize.col('delivery.weightnewbatteries')), 'totalLikes']
+  //       // ],
+  //       include: [
+  //         {
+  //           model: DirectionsRady,
+  //           as: "directionsredy",
+  //           // where: { statusDirections: "Delivery" },
+
+  //         // attributes: [
+  //         //         "id",
+  //         //         "directionid",
+  //         //         "dateofcreation",
+  //         //         "deliverynumberid",
+  //         //       ],
+
+
+  //           include: [
+  //             {
+  //               model: Citydirectionsredy,
+  //               as: "citydirectionsredy",
+  //               // attributes: [
+  //               //   "id",
+  //               //   "cityid",
+  //               //   "directionsredyid",
+  //               //   "dateofcreation",
+  //               // ],
+
+  //               include: [
+  //                 {
+  //                   model: Сity,
+  //                   as: "city",
+  //                   // attributes: ["id"],
+  //                 },
+  //                 {
+  //                   model: Delivery,
+  //                   as: "delivery",
+                    
+
+  //                   // group: ["cityid"],
+  //                 },
+  //               ],
+  //             },
+  //           ],
+  //       group: 'DeliveryNumber.id'
+
+  //         },
+          
+  //       ],
+  //     });
+
+  //     return res.json(allDelivery);
+  //   } catch (error) {}
+  // }
      
   // async getAllDeliveryRedy(req, res) {
   //   try {
